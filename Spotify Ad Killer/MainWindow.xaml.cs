@@ -84,5 +84,10 @@ namespace Spotify_Ad_Killer
                 }
             }
         }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Made by: http://kazesenoue.moe \nGithub: http://github.com/KazeSenoue/Spotify-Ad-Killer");
+        }
     }
 }
