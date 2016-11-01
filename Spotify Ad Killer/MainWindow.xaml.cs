@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace Spotify_Ad_Killer
 {
@@ -24,6 +25,27 @@ namespace Spotify_Ad_Killer
     {
         public string systemPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
         public string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        public string version = "v1.0";
+
+        public void CheckForUpdates()
+        {
+            using (var client = new WebClient())
+            {
+                client.Headers.Add("user-agent", "Spotify-Ad-Killer");
+                var json = client.DownloadString("https://api.github.com/repos/KazeSenoue/Spotify-Ad-Killer/releases/latest");
+                dynamic data = JsonConvert.DeserializeObject(json);
+
+                if (data.tag_name.ToString() != version)
+                {
+                    var dialogResult = MessageBox.Show("An update has been found. Do you wish to update?", "Update warning", MessageBoxButton.YesNo);
+                    if (dialogResult == MessageBoxResult.Yes)
+                    {
+                        System.Diagnostics.Process.Start(data.html_url.ToString());
+                        Application.Current.Shutdown();
+                    }
+                }
+            }
+        }
 
         public bool IsPatchInstalled()
         {
@@ -31,7 +53,7 @@ namespace Spotify_Ad_Killer
             using (var readerLocal = new StreamReader(systemPath + @"\drivers\etc\hosts"))
             {
                 var localFile = readerLocal.ReadToEnd();
-                var stream = client.OpenRead("http://kazesenoue.moe/uploads/hosts.txt");
+                var stream = client.OpenRead("http://kazesenoue.moe/uploads/hosts");
                 var remoteFile = new StreamReader(stream).ReadToEnd();
 
                 if (localFile.Contains(remoteFile) && !File.Exists(appdata + @"\Spotify\Apps\ad.spa"))
@@ -47,6 +69,7 @@ namespace Spotify_Ad_Killer
 
         public MainWindow()
         {
+            CheckForUpdates();
             InitializeComponent();
             if (!IsPatchInstalled())
             {
@@ -54,13 +77,18 @@ namespace Spotify_Ad_Killer
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Made by: http://kazesenoue.moe \nGithub: http://github.com/KazeSenoue/Spotify-Ad-Killer", "About");
+        }
+
+        private void button_Click_1(object sender, RoutedEventArgs e)
         {
             if (IsPatchInstalled())
             {
                 using (var client = new WebClient())
                 {
-                    var stream = client.OpenRead("http://kazesenoue.moe/uploads/hosts.txt");
+                    var stream = client.OpenRead("http://kazesenoue.moe/uploads/hosts");
                     var remoteFile = new StreamReader(stream).ReadToEnd();
                     File.WriteAllText(systemPath + @"\drivers\etc\hosts", File.ReadAllText(systemPath + @"\drivers\etc\hosts").Replace(remoteFile, ""));
                     MessageBox.Show("Ads enabled!");
@@ -75,7 +103,7 @@ namespace Spotify_Ad_Killer
                 using (var client = new WebClient())
                 using (var stream = new StreamWriter(systemPath + @"\drivers\etc\hosts", true))
                 {
-                    var stream2 = client.OpenRead("http://kazesenoue.moe/uploads/hosts.txt");
+                    var stream2 = client.OpenRead("http://kazesenoue.moe/uploads/hosts");
                     var reader = new StreamReader(stream2).ReadToEnd();
 
                     stream.Write(reader);
@@ -83,11 +111,6 @@ namespace Spotify_Ad_Killer
                     button.Content = "Enable ads";
                 }
             }
-        }
-
-        private void button1_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Made by: http://kazesenoue.moe \nGithub: http://github.com/KazeSenoue/Spotify-Ad-Killer");
         }
     }
 }

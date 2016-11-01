@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Spotify_Ad_Killer"
         mc:Ignorable="d"
-        Title="Spotify Ad Killer" Height="174.999" Width="300" ShowInTaskbar="False">
+        Title="Spotify Ad Killer" Height="175" Width="300" ShowInTaskbar="True">
     <Grid>
-        <Button x:Name="button" Content="Enable ads" HorizontalAlignment="Left" Margin="31,20,0,0" VerticalAlignment="Top" Width="231" Height="70"/>
+        <Button x:Name="button" Content="Enable ads" HorizontalAlignment="Left" Margin="31,20,0,0" VerticalAlignment="Top" Width="231" Height="70" Click="button_Click_1"/>
         <Button x:Name="button1" Content="About" HorizontalAlignment="Left" Margin="31,95,0,0" VerticalAlignment="Top" Width="231" Click="button1_Click"/>
 
     </Grid>
