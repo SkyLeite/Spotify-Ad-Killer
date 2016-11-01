@@ -25,7 +25,7 @@ namespace Spotify_Ad_Killer
     {
         public string systemPath = Environment.GetFolderPath(Environment.SpecialFolder.System);
         public string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        public string version = "v1.0";
+        public string version = "v1.1";
 
         public void Log(string info)
         {
