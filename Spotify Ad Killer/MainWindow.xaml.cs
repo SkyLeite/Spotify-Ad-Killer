@@ -139,6 +139,8 @@ namespace Spotify_Ad_Killer
             {
                 Log(ex.Message);
                 Log("---------------------------------\n");
+                MessageBox.Show("Error. Please check the log.txt file.", "Error");
+                Application.Current.Shutdown();
             }
         }
     }
