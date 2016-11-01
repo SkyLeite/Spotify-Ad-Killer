@@ -27,8 +27,19 @@ namespace Spotify_Ad_Killer
         public string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         public string version = "v1.0";
 
+        public void Log(string info)
+        {
+            using (var writer = new StreamWriter("log.txt", true))
+            {
+                var time = DateTime.Now.ToShortTimeString();
+
+                writer.WriteLine("[" + time + "] " + info);
+            }
+        }
+
         public void CheckForUpdates()
         {
+            Log("Checking for updates...");
             using (var client = new WebClient())
             {
                 client.Headers.Add("user-agent", "Spotify-Ad-Killer");
@@ -37,11 +48,17 @@ namespace Spotify_Ad_Killer
 
                 if (data.tag_name.ToString() != version)
                 {
+                    Log("Update found.");
                     var dialogResult = MessageBox.Show("An update has been found. Do you wish to update?", "Update warning", MessageBoxButton.YesNo);
                     if (dialogResult == MessageBoxResult.Yes)
                     {
+                        Log("Opening update link.");
                         System.Diagnostics.Process.Start(data.html_url.ToString());
                         Application.Current.Shutdown();
+                    }
+                    else
+                    {
+                        Log("Update declined.");
                     }
                 }
             }
@@ -58,10 +75,12 @@ namespace Spotify_Ad_Killer
 
                 if (localFile.Contains(remoteFile) && !File.Exists(appdata + @"\Spotify\Apps\ad.spa"))
                 {
+                    Log("Patch has already been applied.");
                     return true;
                 }
                 else
                 {
+                    Log("No patch applied.");
                     return false;
                 }
             }
@@ -84,32 +103,42 @@ namespace Spotify_Ad_Killer
 
         private void button_Click_1(object sender, RoutedEventArgs e)
         {
-            if (IsPatchInstalled())
+            try
             {
-                using (var client = new WebClient())
+                if (IsPatchInstalled())
                 {
-                    var stream = client.OpenRead("http://kazesenoue.moe/uploads/hosts");
-                    var remoteFile = new StreamReader(stream).ReadToEnd();
-                    File.WriteAllText(systemPath + @"\drivers\etc\hosts", File.ReadAllText(systemPath + @"\drivers\etc\hosts").Replace(remoteFile, ""));
-                    MessageBox.Show("Ads enabled!");
-                    button.Content = "Remove ads";
+                    using (var client = new WebClient())
+                    {
+                        var stream = client.OpenRead("http://kazesenoue.moe/uploads/hosts");
+                        var remoteFile = new StreamReader(stream).ReadToEnd();
+                        File.WriteAllText(systemPath + @"\drivers\etc\hosts", File.ReadAllText(systemPath + @"\drivers\etc\hosts").Replace(remoteFile, ""));
+                        MessageBox.Show("Ads enabled!");
+                        button.Content = "Remove ads";
+                        Log("Ads enabled.");
+                    }
+                }
+                else
+                {
+                    if (File.Exists(appdata + @"\Spotify\Apps\ad.spa"))
+                        File.Delete(appdata + @"\Spotify\Apps\ad.spa");
+
+                    using (var client = new WebClient())
+                    using (var stream = new StreamWriter(systemPath + @"\drivers\etc\hosts", true))
+                    {
+                        var stream2 = client.OpenRead("http://kazesenoue.moe/uploads/hosts");
+                        var reader = new StreamReader(stream2).ReadToEnd();
+
+                        stream.Write(reader);
+                        MessageBox.Show("Ads removed!");
+                        button.Content = "Enable ads";
+                        Log("Ads removed.");
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                if (File.Exists(appdata + @"\Spotify\Apps\ad.spa"))
-                    File.Delete(appdata + @"\Spotify\Apps\ad.spa");
-
-                using (var client = new WebClient())
-                using (var stream = new StreamWriter(systemPath + @"\drivers\etc\hosts", true))
-                {
-                    var stream2 = client.OpenRead("http://kazesenoue.moe/uploads/hosts");
-                    var reader = new StreamReader(stream2).ReadToEnd();
-
-                    stream.Write(reader);
-                    MessageBox.Show("Ads removed!");
-                    button.Content = "Enable ads";
-                }
+                Log(ex.Message);
+                Log("---------------------------------\n");
             }
         }
     }
