@@ -98,7 +98,7 @@ namespace Spotify_Ad_Killer
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Made by: http://kazesenoue.moe \nGithub: http://github.com/KazeSenoue/Spotify-Ad-Killer", "About");
+            MessageBox.Show("Made by: http://rodrigo.li \nGithub: http://github.com/Kxze/Spotify-Ad-Killer", "About");
         }
 
         private void button_Click_1(object sender, RoutedEventArgs e)
